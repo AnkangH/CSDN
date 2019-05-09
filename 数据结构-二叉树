@@ -1,0 +1,99 @@
+#include<iostream>
+#include<vector>//for vector
+#include<queue>
+using namespace std;
+struct TreeNode
+{
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode(int x) :val(x), left(NULL), right(NULL) {}
+};
+void treePreOrder(TreeNode*);//前序遍历
+void treeMidOrder(TreeNode*);//中序遍历
+void treeBacOrder(TreeNode*);//后序遍历
+void treeLayOrder(TreeNode*);//按层遍历
+void treePreOrder(TreeNode*,vector<int>&);//前序遍历，第二个输入为输出遍历
+vector<int> treePreOrderRe(TreeNode* t);//前序遍历的有返回值版本
+										//无法仅按返回值重载函数，所以这里名称要与无返回值的有区别
+int main()
+{
+	TreeNode* t = new TreeNode(1);
+	TreeNode* head = t;
+	t->left = new TreeNode(2);
+	t->right = new TreeNode(3);
+	t = head->left;
+	t->left = new TreeNode(4);
+	t->right = new TreeNode(5);
+	t = head->right;
+	t->left = new TreeNode(6);
+	t->right = new TreeNode(7);
+	cout << "Tree Pre order without return value: " << endl;
+	treePreOrder(head);
+	cout << endl;
+	vector<int>res=treePreOrderRe(head);
+	int size = res.size();
+	cout << "Tree Pre order with return value: " << endl;
+	for (int i = 0; i < size; i++)
+		cout << res[i];
+	cout << endl<<"Tree Mid order: " << endl;
+	treeMidOrder(head);
+	cout << endl<<"Tree Back order: " << endl;
+	treeBacOrder(head);
+	cout << endl << "Tree Layer order: " << endl;
+	treeLayOrder(head);
+	return 0;
+}
+void treePreOrder(TreeNode* t)
+{
+	if (t == NULL)
+		return;
+	cout << t->val;
+	treePreOrder(t->left);
+	treePreOrder(t->right);
+}
+void treePreOrder(TreeNode* t, vector<int>& res)
+{
+	if (t == NULL)
+		return;
+	res.push_back(t->val);
+	treePreOrder(t->left,res);
+	treePreOrder(t->right, res);
+}
+vector<int> treePreOrderRe(TreeNode* t)
+{
+	vector<int> res;
+	treePreOrder(t, res);
+	return res;
+}
+void treeMidOrder(TreeNode* t)
+{
+	if (t == NULL)
+		return;
+	treeMidOrder(t->left);
+	cout << t->val;
+	treeMidOrder(t->right);
+}
+void treeBacOrder(TreeNode* t)
+{
+	if (t == NULL)
+		return;
+	treeBacOrder(t->left);
+	treeBacOrder(t->right);
+	cout << t->val;
+}
+void treeLayOrder(TreeNode* t)
+{
+	queue<TreeNode*> que;
+	que.push(t);
+	while (!que.empty())
+	{
+		TreeNode* temp = que.front();
+		cout << temp->val;
+		que.pop();
+		if (temp->left != NULL)
+			que.push(temp->left);
+		if (temp->right != NULL)
+			que.push(temp->right);
+	}
+}
