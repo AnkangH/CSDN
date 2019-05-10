@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>//for vector
 #include<queue>
+#include<stack>
 using namespace std;
 struct TreeNode
 {
@@ -14,8 +15,10 @@ void treeMidOrder(TreeNode*);//中序遍历
 void treeBacOrder(TreeNode*);//后序遍历
 void treeLayOrder(TreeNode*);//按层遍历
 void treePreOrder(TreeNode*,vector<int>&);//前序遍历，第二个输入为输出遍历
-vector<int> treePreOrderRe(TreeNode* t);//前序遍历的有返回值版本
-										//无法仅按返回值重载函数，所以这里名称要与无返回值的有区别
+vector<int> treePreOrderRe(TreeNode* t);//前序遍历的有返回值版本 无法仅按返回值重载函数，所以这里名称要与无返回值的有区别
+vector<int> preorderTraversal(TreeNode* root);
+vector<int> inorderTraversal(TreeNode* root);
+vector<int> postorderTraversal(TreeNode* root);
 int main()
 {
 	TreeNode* t = new TreeNode(1);
@@ -96,4 +99,66 @@ void treeLayOrder(TreeNode* t)
 		if (temp->right != NULL)
 			que.push(temp->right);
 	}
+}
+vector<int> preorderTraversal(TreeNode* root)
+{
+	vector<int>res;
+	if (root == NULL)
+		return res;//预判断树空
+	stack<TreeNode*> st;//辅助栈
+	st.push(root);
+	while (!st.empty())
+	{
+		TreeNode* temp = st.top();//当前节点为栈顶元素
+		st.pop();//访问后出栈
+		if (temp != NULL)
+			res.push_back(temp->val);//当前元素非空，其值放入遍历序列
+		if (temp->right != NULL)
+			st.push(temp->right);//先右  这样栈顶后右
+		if (temp->left != NULL)
+			st.push(temp->left);//后左  这样栈顶先左 满足先序遍历
+	}
+	return res;
+}
+vector<int> inorderTraversal(TreeNode* root)
+{
+	vector<int> res;
+	if (root == NULL)
+		return res;
+	stack<TreeNode*> st;
+	TreeNode* cur = root;
+	while (cur != NULL || !st.empty())
+	{
+		while (cur != NULL)
+		{
+			st.push(cur);
+			cur = cur->left;//左斜树节点全部入栈
+		}
+		TreeNode* t = st.top();
+		st.pop();//栈顶出栈
+		res.push_back(t->val);//栈顶节点值保存
+		cur = t->right;//遍历右节点。
+	}
+	return res;
+}
+vector<int> postorderTraversal(TreeNode* root)
+{
+	vector<int> res;
+	if (root == NULL)
+		return res;
+	stack<TreeNode*> st;//辅助栈
+	st.push(root);
+	while (!st.empty())
+	{
+		TreeNode* t = st.top();
+		st.pop();
+		if (t != NULL)
+			res.push_back(t->val);
+		if (t->left != NULL)
+			st.push(t->left);//先左 这样栈顶后左
+		if (t->right != NULL)
+			st.push(t->right);//后右 这样栈顶先右  
+	}
+	reverse(res.begin(), res.end());//res中保存了根右左的遍历顺序，反转即可。
+	return res;
 }
