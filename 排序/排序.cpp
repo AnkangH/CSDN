@@ -1,17 +1,16 @@
-#include<iostream>
-#include<vector>
-#include<queue>      //for priority_queue
-#include<functional> //for greater<>
-#include<algorithm>
+#include<iostream>	//for cout endl
+#include<vector>	//for vector
+#include<queue>      	//for priority_queue
+#include<functional> 	//for greater<>
+#include<algorithm>	//for pow()
 using namespace std;
-void insertionSort(vector<int>&,bool method=false);
-void heapSort(vector<int>&,bool method=false);
-void shellSort(vector<int>&, bool method=false);
-vector<int> mergeVector(vector<int>,vector<int>, bool method=false);
-void merge(vector<int>&, int, bool method=false);
-void mergeSort(vector<int>&, bool method = false);
-void bucketSort(vector<int>&, int, bool method = false);
-void radixSort(vector<int>&, int, bool method = false);
+void insertionSort(vector<int>&arr,bool method=false);//插入排序  arr待排序数组 默认false升序 true降序
+void heapSort(vector<int>&arr,bool method=false);//堆排序 arr待排序数组 默认false升序 true降序
+void shellSort(vector<int>&arr, bool method=false);//希尔排序 arr待排序数组 默认false升序 true降序
+vector<int> mergeVector(vector<int>arr1, vector<int>arr2, bool method)//合并两有序数组 arr1 arr2待合并有序数组
+//返回值排序数组 默认false升序 true降序
+void bucketSort(vector<int>&arr, int n, bool method = false);//桶排序  arr待排序数组 n桶的个数 默认false升序 true降序
+void radixSort(vector<int>&arr, int b, bool method = false);//基数排序 arr待排序数组 b基数（即桶的个数）默认false升序 true降序
 int main()
 {
 	vector<int>arr{ 64,8,216,512,027,729,0,1,343,125 };
@@ -229,32 +228,6 @@ vector<int> mergeVector(vector<int>arr1, vector<int>arr2, bool method)
 			}
 		}
 	return res;
-}
-void merge(vector<int>&arr, int n, bool method)
-{
-	//n指代第几次合并 n=2 每个数组中有两个元素
-	//n=1代表每个数组中有一个元素。
-	int size = arr.size();
-	vector<vector<int>> temp;//需要进行合并的数组
-	int k = 0;
-	for (int i = 0; i < size; i++)
-	{
-		temp[k].push_back(arr[i]);
-		int sizeTemp = temp[k].size();
-		if (sizeTemp == n)//数组中有一个
-			k++;
-	}
-	int tempSize = temp.size();
-	vector<int> res;
-	for (int i = 0; i < tempSize; i += 2)
-	{
-		vector<int> mergeTemp = mergeVector(temp[i], temp[i + 1]);
-		int size = mergeTemp.size();
-		for (int i = 0; i < size; i++)
-			res.push_back(mergeTemp[i]);
-	}
-	for (int i = 0; i < size; i++)
-		arr[i] = res[i];
 }
 void bucketSort(vector<int>&arr,int m, bool method)//m_min=max(arr)
 {
