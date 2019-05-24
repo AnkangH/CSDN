@@ -1,18 +1,59 @@
-#include<iostream>	//for cout endl
-#include<vector>	//for vector
-#include<queue>      	//for priority_queue
-#include<functional> 	//for greater<>
-#include<algorithm>	//for pow()
+#include<iostream>		//for cout endl
+#include<vector>		//for vector
+#include<queue>			//for priority_queue
+#include<functional>	//for greater<>
+#include<string>		//for string
+#include<algorithm>		//for pow()
 using namespace std;
-void insertionSort(vector<int>&arr,bool method=false);//插入排序  arr待排序数组 默认false升序 true降序
-void heapSort(vector<int>&arr,bool method=false);//堆排序 arr待排序数组 默认false升序 true降序
-void shellSort(vector<int>&arr, bool method=false);//希尔排序 arr待排序数组 默认false升序 true降序
-vector<int> mergeVector(vector<int>arr1, vector<int>arr2, bool method)//合并两有序数组 arr1 arr2待合并有序数组
-//返回值排序数组 默认false升序 true降序
-void bucketSort(vector<int>&arr, int n, bool method = false);//桶排序  arr待排序数组 n桶的个数 默认false升序 true降序
-void radixSort(vector<int>&arr, int b, bool method = false);//基数排序 arr待排序数组 b基数（即桶的个数）默认false升序 true降序
+void insertionSort(vector<int>&arr,bool method=false);
+//插入排序 arr待排序数组 method默认false升序 true降序
+void heapSort(vector<int>&arr,bool method=false);
+//堆排序 arr待排序数组 method默认false升序 true降序
+void shellSort(vector<int>&arr, bool method=false);
+//希尔排序 arr待排序数组 method默认false升序 true降序
+vector<int> mergeVector(vector<int>arr1,vector<int>arr2, bool method=false);
+//合并两个同排序有序数组arr1和arr2 method默认false升序 true降序
+void bucketSort(vector<int>&arr, int n, bool method = false);
+//桶排序 arr待排序数组 n桶个数 method默认false升序 true降序
+void radixSortInt(vector<int>&arr, bool method = false);
+//整型基数排序 arr待排序数组 method默认false升序 true降序
+void radixSortStr(vector<string>&arr,bool method=false);
+//字符串基数排序 arr待排序字符串数组 method默认false升序 true降序
+void radixSortChar(string&arr, bool method = false);
+//字符基数排序 arr待排序字符串 method默认false升序 true降序
+void permutation(string str, vector<string>&res,int start, int end);
+//全排列 str待处理字符串 res排列结果 start=0，end=str.size();
 int main()
 {
+	/*//字符桶排序测试用例
+	string arr{ "bdecdAEGRD" };
+	radixSortChar(arr);
+	cout << arr << endl;
+	radixSortChar(arr, true);
+	cout << arr << endl;
+	*/
+	/*
+	//字符串基数排序测试用例
+	vector<string>arr{ "aacbd","aasde","bdegs","bdega","nksdj" };
+	cout << "Original String Array:" << endl;
+	for (auto pt : arr)
+		cout << pt << " ";
+	cout << endl;
+	cout << "RadixSortStr Increase:" << endl;
+	radixSortStr(arr);
+	cout << "RadixSortStr Increase Result:" << endl;
+	for (auto pt : arr)
+		cout << pt << " ";
+	cout << endl;
+	cout << "RadixSortStr Decrease:" << endl;
+	radixSortStr(arr,true);
+	cout << "RadixSortStr Decrease Result:" << endl;
+	for (auto pt : arr)
+		cout << pt << " ";
+	cout << endl;
+	*/
+	/*
+	//整型基数排序测试用例
 	vector<int>arr{ 64,8,216,512,027,729,0,1,343,125 };
 	int size = arr.size();
 	cout << "Original array:" << endl;
@@ -20,18 +61,18 @@ int main()
 		cout << arr[i] << " ";
 	cout << endl;
 	cout << "radixSort increase:" << endl;
-	radixSort(arr, 10);
+	radixSortInt(arr);
 	cout << "radixSort increase result:" << endl;
 	for (int i = 0; i < arr.size(); i++)
 		cout << arr[i] << " ";
 	cout << endl;
 	arr = { 64,8,216,512,027,729,0,1,343,125 };
 	cout << "radixSort decrease:" << endl;
-	radixSort(arr, 10,true);
+	radixSortInt(arr,true);
 	cout << "radixSort decrease result:" << endl;
 	for (int i = 0; i < arr.size(); i++)
 		cout << arr[i] << " ";
-	cout << endl;
+	cout << endl;*/
 	return 0;
 }
 void insertionSort(vector<int>& arr,bool method)
@@ -255,9 +296,10 @@ void bucketSort(vector<int>&arr,int m, bool method)//m_min=max(arr)
 		}
 	}
 }
-void radixSort(vector<int>&arr, int b, bool method)
+void radixSortInt(vector<int>&arr, bool method)
 {
 	int size = arr.size();
+	int b = 10;//整形 10进制
 	vector<vector<int>> bucket(b);//因为某一位相同而其他位可能不同
 	if(!method)
 	for (int i = 1; i < 32; i++)//所以每个桶中不是存储出现次数 而是该位相同的所有数字
@@ -304,4 +346,83 @@ void radixSort(vector<int>&arr, int b, bool method)
 			for (int j = 0; j < b; j++)//注意当更新arr中的值后，将bucket中每个元素清空
 				bucket[j].clear();
 		}
+}
+void radixSortStr(vector<string>&arr,bool method)
+{
+	int size = arr.size();//字符串个数
+	int size2 = arr[0].size();//每个字符串字符个数
+	int bucketSize = 256;
+	vector<vector<string>>bucket(bucketSize);
+	if(!method)
+	for (int i = size2-1; i >= 0; i--)//比较字符串的每一位字符 字符共size2位
+	{
+		for (int j = 0; j < size; j++)//对每一个字符串操作 字符串共size个
+			bucket[arr[j][i]].push_back(arr[j]);
+		arr.clear();
+		for (int j = 0; j < bucketSize; j++)//从前向后遍历每个桶 ascii码升序
+		{
+			int size = bucket[j].size();
+			for (int k = 0; k < size; k++)//顺序取出每个桶中字符串
+				arr.push_back(bucket[j][k]);
+		}
+		/*
+		//打印每一轮（按字符串每一位）桶排序后的数字排序
+		cout << size2-i << " round: " << endl;
+		for (int j = 0; j < size; j++)
+			cout << arr[j] << " ";
+		cout << endl;*/
+		for (int j = 0; j < bucketSize; j++)
+			bucket[j].clear();
+	}
+	else
+		for (int i = size2 - 1; i >= 0; i--)//比较字符串的每一位字符 字符共size2位
+		{
+			for (int j = 0; j < size; j++)//对每一个字符串操作 字符串共size个
+				bucket[arr[j][i]].push_back(arr[j]);
+			arr.clear();
+			for (int j = bucketSize-1; j >= 0; j--)//从前向后遍历每个桶 ascii码升序
+			{
+				int size = bucket[j].size();
+				for (int k = 0; k < size; k++)//顺序取出每个桶中字符串
+					arr.push_back(bucket[j][k]);
+			}
+			/*
+			//打印每一轮（按字符串每一位）桶排序后的数字排序
+			cout << size2-i << " round: " << endl;
+			for (int j = 0; j < size; j++)
+				cout << arr[j] << " ";
+			cout << endl;*/
+			for (int j = 0; j < bucketSize; j++)
+				bucket[j].clear();
+		}
+}
+void permutation(string str,vector<string>&res, int start, int end)
+{
+	if (start == end)
+	{
+		res.push_back(str);
+		return;
+	}
+	for (int i = start; i < end; i++) {
+		swap(str[start], str[i]);      //交换
+		permutation(str,res,start + 1, end);   //分解为子问题a[start+1,...,end-1]的全排列
+		swap(str[start], str[i]);
+	}
+}
+void radixSortChar(string& str,bool method)
+{
+	int size = str.size();
+	int bucketSize = 256;//字符最多有256个
+	vector<char> bucket(bucketSize, 0);
+	for (int i = 0; i<size; i++)
+		bucket[str[i]]++;//记录每个字符出现次数
+	str.clear();//清空输入字符串 为更新做准备
+	if(!method)
+	for (int i = 0; i<bucketSize; i++)//顺序遍历桶 字符串升序输出
+		for (int j = 0; j<bucket[i]; j++)
+			str.push_back(i);
+	else
+		for (int i = bucketSize-1; i>=0; i--)//倒序遍历桶 字符串降序输出
+			for (int j = 0; j<bucket[i]; j++)
+				str.push_back(i);
 }
