@@ -1,6 +1,6 @@
-#include<iostream>
-#include<vector>//for vector
-#include<queue>
+#include<iostream>		//for cout endl
+#include<vector>		//for vector
+#include<queue>			//for queue
 #include<stack>
 using namespace std;
 struct TreeNode
@@ -10,17 +10,17 @@ struct TreeNode
 	TreeNode* right;
 	TreeNode(int x) :val(x), left(NULL), right(NULL) {}
 };
-void treePreOrder(TreeNode*);//前序遍历
-void treeMidOrder(TreeNode*);//中序遍历
-void treeBacOrder(TreeNode*);//后序遍历
-void treeLayOrder(TreeNode*);//按层遍历
-void treePreOrder(TreeNode*,vector<int>&);//前序遍历，第二个输入为输出遍历
-vector<int> treePreOrderRe(TreeNode* t);//前序遍历的有返回值版本 无法仅按返回值重载函数，所以这里名称要与无返回值的有区别
-vector<int> preorderTraversal(TreeNode* root);
-vector<int> inorderTraversal(TreeNode* root);
-vector<int> postorderTraversal(TreeNode* root);
+void treeLayOrder(TreeNode*);//层序遍历 无返回值
+void treeLayOrder(TreeNode*, vector<int>&);//层序遍历 有返回值
+void treePreOrder(TreeNode*, vector<int>&);//前序遍历，第二个输入为输出遍历
+void treeMidOrder(TreeNode*, vector<int>&);//序遍历，第二个输入为输出遍历
+void treeBacOrder(TreeNode*, vector<int>&);//前序遍历，第二个输入为输出遍历
+vector<int> preorderTraversal(TreeNode* root);//前序遍历非递归
+vector<int> inorderTraversal(TreeNode* root);//中序遍历非递归
+vector<int> postorderTraversal(TreeNode* root);//后序遍历非递归
 int main()
 {
+	//构建二叉树
 	TreeNode* t = new TreeNode(1);
 	TreeNode* head = t;
 	t->left = new TreeNode(2);
@@ -31,73 +31,82 @@ int main()
 	t = head->right;
 	t->left = new TreeNode(6);
 	t->right = new TreeNode(7);
-	cout << "Tree Pre order without return value: " << endl;
-	treePreOrder(head);
+	vector<int>res;
+	//前序遍历
+	cout << "Tree Pre order: " << endl;
+	treePreOrder(head,res);
+	for (auto p : res)
+		cout << p << " ";
 	cout << endl;
-	vector<int>res=treePreOrderRe(head);
-	int size = res.size();
-	cout << "Tree Pre order with return value: " << endl;
-	for (int i = 0; i < size; i++)
-		cout << res[i];
-	cout << endl<<"Tree Mid order: " << endl;
-	treeMidOrder(head);
-	cout << endl<<"Tree Back order: " << endl;
-	treeBacOrder(head);
-	cout << endl << "Tree Layer order: " << endl;
+	//中序变量
+	res.clear();
+	cout << "Tree Mid order: " << endl;
+	treeMidOrder(head,res);
+	for (auto p : res)
+		cout << p << " ";
+	cout << endl;
+	//后序遍历
+	res.clear();
+	cout << "Tree Back order: " << endl;
+	treeBacOrder(head,res);
+	for (auto p : res)
+		cout << p << " ";
+	cout << endl;
+	cout << "Tree Layer order: " << endl;
 	treeLayOrder(head);
+	cout << "Tree Layer order with return array:" << endl;
+	res.clear();
+	treeLayOrder(head, res);
+	for (auto p : res)
+		cout << p << " ";
+	cout << endl;
 	return 0;
-}
-void treePreOrder(TreeNode* t)
-{
-	if (t == NULL)
-		return;
-	cout << t->val;
-	treePreOrder(t->left);
-	treePreOrder(t->right);
 }
 void treePreOrder(TreeNode* t, vector<int>& res)
 {
 	if (t == NULL)
 		return;
 	res.push_back(t->val);
-	treePreOrder(t->left,res);
+	treePreOrder(t->left, res);
 	treePreOrder(t->right, res);
 }
-vector<int> treePreOrderRe(TreeNode* t)
-{
-	vector<int> res;
-	treePreOrder(t, res);
-	return res;
-}
-void treeMidOrder(TreeNode* t)
+void treeMidOrder(TreeNode* t, vector<int>& res)
 {
 	if (t == NULL)
 		return;
-	treeMidOrder(t->left);
-	cout << t->val;
-	treeMidOrder(t->right);
+	treePreOrder(t->left, res);
+	res.push_back(t->val);
+	treePreOrder(t->right, res);
 }
-void treeBacOrder(TreeNode* t)
+void treeBacOrder(TreeNode* t, vector<int>& res)
 {
 	if (t == NULL)
 		return;
-	treeBacOrder(t->left);
-	treeBacOrder(t->right);
-	cout << t->val;
+	treePreOrder(t->left, res);
+	treePreOrder(t->right, res);
+	res.push_back(t->val);
 }
 void treeLayOrder(TreeNode* t)
 {
 	queue<TreeNode*> que;
 	que.push(t);
+	int layerCount = 1;
 	while (!que.empty())
 	{
-		TreeNode* temp = que.front();
-		cout << temp->val;
-		que.pop();
-		if (temp->left != NULL)
-			que.push(temp->left);
-		if (temp->right != NULL)
-			que.push(temp->right);
+		int size = que.size();
+		cout << "layer" << layerCount << ":" << endl;
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* temp = que.front();
+			cout << temp->val;
+			que.pop();
+			if (temp->left != NULL)
+				que.push(temp->left);
+			if (temp->right != NULL)
+				que.push(temp->right);
+		}
+		layerCount++;
+		cout << endl;
 	}
 }
 vector<int> preorderTraversal(TreeNode* root)
@@ -161,4 +170,23 @@ vector<int> postorderTraversal(TreeNode* root)
 	}
 	reverse(res.begin(), res.end());//res中保存了根右左的遍历顺序，反转即可。
 	return res;
+}
+void treeLayOrder(TreeNode* root, vector<int>& arr)//层序遍历 有返回值
+{
+	queue<TreeNode*> q;
+	q.push(root);
+	while (!q.empty())
+	{
+		int size = q.size();
+		for (int i = 0; i < size; i++)
+		{
+			TreeNode* t = q.front();
+			arr.push_back(t->val);
+			q.pop();
+			if (t->left != nullptr)
+				q.push(t->left);
+			if (t->right != nullptr)
+				q.push(t->right);
+		}
+	}
 }
