@@ -1,9 +1,8 @@
-#include<iostream>	//for cout endl
-#include<vector>	//for vector
-#include<queue>		//for queue
-#include<unordered_map>
-#include<functional>
-#include<algorithm>
+#include<iostream>			//for cout endl
+#include<vector>			//for vector
+#include<queue>				//for queue
+#include<unordered_map>		//for unordered_map
+#include<algorithm>			//for min()
 using namespace std;
 struct Vertex
 {
@@ -12,9 +11,33 @@ struct Vertex
 	int dis;//起点到当前节点的最小距离
 };
 void bfsViaStruct(void);
-vector<int> bfsOfWeightGraph(const unordered_map<int, vector<pair<int, int>>>&, int start, int end = -1);
+//bfs搜索 结构体实现 求无向图赋权最小路径
+vector<int> bfsOfWeightGraph(const unordered_map<int, vector<pair<int, int>>>& graph, int start, int end = -1);
+//Dijkstra算法求赋权最小路径 graph为邻接表 索引从0开始 start与end的索引从0开始，+1代表节点索引
+vector<pair<int, int>> primOfWeightGraph(const unordered_map<int, vector<pair<int, int>>>& graph);
+//Prim算法求赋权无向图的最小生成树
 int main()
 {
+	unordered_map<int, vector<pair<int, int>>> graph;
+	graph[1] = { {2,2},{4,1},{3,4} };
+	graph[2] = { { 1,2 },{ 4,3 },{ 5,10 } };
+	graph[3] = { { 1,4 },{ 4,2 },{ 6,5 } };
+	graph[4] = { { 1,1 },{ 2,3 },{ 5,7 },{7,4},{6,8},{3,2} };
+	graph[5] = { { 2,10 },{ 4,7 },{ 7,6 } };
+	graph[6] = { { 3,5 },{ 4,8 },{ 7,1 } };
+	graph[7] = { { 4,4 },{ 6,1 },{ 5,6 } };
+	auto prim = primOfWeightGraph(graph);
+	int size = prim.size();
+	cout << "Afted Find minimum Tree :" << endl;
+	int minPath = 0;
+	for (int i = 1; i < size; i++)
+	{
+		cout << "Vertex" << i << ",Link Vertex" << prim[i].first << " ,path=" << prim[i].second << endl;
+		minPath += prim[i].second;
+	}
+	cout << "MinPath=" << minPath << endl;
+	/*
+	// Dijkstra算法求赋权有向图的最小路径测试用例
 	//赋权图 注意图中顶点序号-1为储存结构中的索引
 	unordered_map<int, vector<pair<int, int> > >graph;
 	graph[0] = { { 1,2 },{ 3,1 } };
@@ -37,6 +60,7 @@ int main()
 	cout << "Dist of Vertex" << start + 1 << " to Vertex" << end + 1 << ":" << endl;
 	dist = bfsOfWeightGraph(graph, start, end);
 	cout << "dist[" << start + 1 << "]-dist[" << end + 1 << "]=" << dist[end] << endl;
+	*/
 	return 0;
 }
 void bfsViaStruct(void)
@@ -218,4 +242,70 @@ vector<int> bfsOfWeightGraph(const unordered_map<int, vector<pair<int, int>>>&gr
 		}
 		return dist;
 	}
+}
+vector<pair<int, int>> primOfWeightGraph(const unordered_map<int, vector<pair<int, int>>>& graph)
+{
+	int sizeGraph = graph.size() + 1;
+	vector<pair<int, int>>prim(sizeGraph);//下标从1开始 first邻接索引，second距离
+	unordered_map<int, bool>known;
+	//初始化 除起点外均初始化为INT_MAX
+	prim[1].first = 1;
+	prim[1].second = 0;
+	for (int i = 2; i < sizeGraph; i++)
+	{
+		prim[i].first = INT_MAX;
+		prim[i].second = INT_MAX;
+	}
+	//执行Prim算法
+	queue<int>q;
+	q.push(1);
+	known[1] = true;
+	while (!q.empty())
+	{
+		int cur = q.front();
+		cout << "Vertex"<<cur << " is known:" << endl;
+		q.pop();
+		auto adj = graph.find(cur)->second;//adj邻接表 adj[i]=<index,path>
+		int sizeAdj = adj.size();
+		for(int i=0;i<sizeAdj;i++)
+			if (known.count(adj[i].first) == 0)
+			{
+				int preDist = prim[adj[i].first].second;
+				int curDist = adj[i].second;
+				if (preDist > curDist)//cur的邻接节点 若边小于邻接节点的当前值
+				{
+					prim[adj[i].first].second = curDist;//值修改为小的边
+					prim[adj[i].first].first = cur;//邻接节点为当前节点
+				}
+			}
+		//路径最小的未访问的顶点入队列进行下次判断
+		int minVal = INT_MAX;
+		int minIndex = INT_MAX;
+		for (int i = 1; i < sizeGraph; i++)
+		{
+			if (known.count(i) == 0)
+			{
+				if (minVal == INT_MAX)
+				{
+					minVal = prim[i].second;
+					minIndex = i;
+				}
+				else if (minVal > prim[i].second)
+				{
+					minVal = prim[i].second;
+					minIndex = i;
+				}
+			}
+		}
+		//仍有未访问的节点
+		if(minIndex!=INT_MAX)
+		{
+			q.push(minIndex);
+			known[minIndex] = true;
+		}
+		//打印每个顶点访问后的结果
+		for (int i = 1; i < sizeGraph; i++)
+			cout << "Vertex" << i << " link " << prim[i].first << " path = " << prim[i].second << endl;
+	}
+	return prim;
 }
