@@ -30,7 +30,7 @@ int one(int x)
 	int res = 0;
 	for (int i = 0; i < 32; i++)
 	{
-		if ((x & 1) == 1)
+		if ((x & 1) == 1)//关系运算符优先级高于位运算符
 			res++;
 		x = x >> 1;
 	}
